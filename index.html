@@ -544,6 +544,11 @@
             background: #5d7059;
         }
 
+        .add-cart-btn:disabled {
+            background: #CCC;
+            cursor: not-allowed;
+        }
+
         /* 關於我們 */
         .about-box {
             background: white;
@@ -646,6 +651,16 @@
             background: var(--bg-paper);
         }
 
+        .cart-quota-banner {
+            background: var(--accent-green-light);
+            color: var(--accent-green);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
         .cart-body {
             padding: 1.5rem;
             flex-grow: 1;
@@ -726,7 +741,6 @@
             font-weight: 500;
         }
 
-        /* 避免 iOS 輸入時自動放大 */
         .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 0.6rem;
@@ -870,6 +884,27 @@
             box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
         }
 
+        /* 系統狀態公告 Banner */
+        .system-banner {
+            max-width: 1200px;
+            margin: 1rem auto 0;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            display: none;
+        }
+        .system-banner.warning {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .system-banner.info {
+            background-color: #e2f0d9;
+            color: #385723;
+            border: 1px solid #c3e6cb;
+        }
+
         footer {
             background: #2D2625;
             color: #C2B8B2;
@@ -947,6 +982,9 @@
         </button>
     </nav>
 
+    <!-- 系統控制公告狀態區塊 -->
+    <div id="systemBanner" class="system-banner"></div>
+
     <!-- 手機版側滑選單 -->
     <div class="mobile-menu" id="mobileMenu">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -965,7 +1003,7 @@
             <h1 class="hero-title">一口一口，<span>慢慢吃</span><br>長大的小手美味。</h1>
             <p class="hero-desc">嚴選 100% 在地有機原型蔬菜，無鹽無添加。專為 6-12 個月寶寶設計的握持尺寸，陪寶寶邁出自主進食的第一步。</p>
             <div class="hero-btns">
-                <a href="#products" class="btn-primary">立即選購手指食物</a>
+                <a href="#products" class="btn-primary">獨立選購手指食物</a>
                 <a href="#about" class="btn-secondary">品牌理念</a>
             </div>
         </div>
@@ -1029,7 +1067,7 @@
                 <h3>像家一樣溫柔的餐桌起點</h3>
                 <p>「慢慢吃」源自一位母親對寶寶自主進食的無微不至。我們參考日式職人精神與旅居理念，嚴選最天然的原生野菜食材。</p>
                 <p>我們相信，吃飯不只是補充營養，更是寶寶用五感探索世界的第一堂課。透過拿取、捏壓、咬嚼，讓寶寶在沒有壓力的歡笑中，享受屬於自己的美味時光。</p>
-                <p><strong>配送與付款：</strong>提供 7-ELEVEN 與 全家「冷凍店到店」服務。您可選擇「純取貨（先轉帳）」或「取貨付款」。若選擇先轉帳，匯款帳號將由 LINE 專人提供。</p>
+                <p><strong>配送與付款：</strong>提供 7-ELEVEN 與 全家「冷凍店到店」服務，結帳一律採用「超商貨到付款」。</p>
             </div>
         </div>
     </section>
@@ -1060,8 +1098,8 @@
             <div class="faq-item" onclick="toggleFaq(this)">
                 <div class="faq-question">Q: 超商冷凍運費如何計算？ <span>＋</span></div>
                 <div class="faq-answer">
-                    • 7-ELEVEN 冷凍交貨便：純取貨 $129 / 取貨付款 $134<br>
-                    • 全家 冷凍店到店：純取貨 $99 / 取貨付款 $114
+                    • 7-ELEVEN 冷凍交貨便：取貨付款 $134<br>
+                    • 全家 冷凍店到店：取貨付款 $114
                 </div>
             </div>
             <div class="faq-item" onclick="toggleFaq(this)">
@@ -1078,24 +1116,28 @@
             <h3>您的購物車 🛒</h3>
             <button style="background:none; border:none; font-size:1.5rem; cursor:pointer;" onclick="toggleCart()" aria-label="關閉購物車">×</button>
         </div>
+        
+        <!-- 💡 購物車內即時顯示 Google Sheet 剩餘可訂購量 -->
+        <div class="cart-quota-banner" id="cartQuotaDisplay">
+            💡 本月試算表剩餘可訂購量：載入中...
+        </div>
+
         <div class="cart-body" id="cartItems">
             <!-- 購物車項目 -->
         </div>
         
         <div class="cart-body" style="padding-top:0;">
             <div class="payment-notice" id="paymentNotice">
-                💡 純取貨需先完成匯款 (帳號將由專人於 LINE 提供)；選取貨付款可至門市再付現。
+                📦 目前結帳固定採用「超商貨到付款」，請至指定門市取貨時支付現金即可。
             </div>
             <div class="checkout-form-section">
                 <h4>選擇配送與付款方式</h4>
                 
                 <div class="form-group">
-                    <label for="shipping-option">超商與配送方式 (必選)</label>
+                    <label for="shipping-option">超商配送方式 (必選)</label>
                     <select id="shipping-option" class="shipping-selector" onchange="handleShippingChange()">
-                        <option value="711_prepaid" data-store="7-ELEVEN" data-type="純取貨 (先匯款)" data-fee="129">7-ELEVEN 冷凍交貨便 - 純取貨 ($129)</option>
-                        <option value="711_cod" data-store="7-ELEVEN" data-type="取貨付款" data-fee="134">7-ELEVEN 冷凍交貨便 - 取貨付款 ($134)</option>
-                        <option value="fm_prepaid" data-store="全家 FamilyMart" data-type="純取貨 (先匯款)" data-fee="99">全家 冷凍店到店 - 純取貨 ($99)</option>
-                        <option value="fm_cod" data-store="全家 FamilyMart" data-type="取貨付款" data-fee="114">全家 冷凍店到店 - 取貨付款 ($114)</option>
+                        <option value="711_cod" data-store="7-ELEVEN" data-type="貨到付款" data-fee="134">7-ELEVEN 冷凍交貨便 - 貨到付款 ($134)</option>
+                        <option value="fm_cod" data-store="全家 FamilyMart" data-type="貨到付款" data-fee="114">全家 冷凍店到店 - 貨到付款 ($114)</option>
                     </select>
                 </div>
 
@@ -1153,6 +1195,18 @@
     </footer>
 
     <script>
+        // 🌟 請在此貼上您整合後的 Apps Script Web App URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6GmVteDPq-g9J_MxraUQ8R2SxSXvwLvEo_MQ-IYBxk3q_eEGV-cPVGKQ6FT7e3LiuLA/exec";
+        
+        const CONTROL_SCRIPT_URL = SCRIPT_URL;
+        const DATA_SCRIPT_URL = SCRIPT_URL;
+
+        let systemIsOpen = true;
+        let remainingQuota = 0;
+        
+        // 🌟 1. 最小訂購量改為 5 件
+        const MIN_ORDER_QTY = 5; 
+
         function safeGtag(...args) {
             try {
                 if (typeof gtag === 'function') {
@@ -1171,12 +1225,13 @@
             purchase: (transactionId, total, items, shippingFee) => safeGtag('event', 'purchase', { transaction_id: transactionId, value: total, currency: 'TWD', tax: 0, shipping: shippingFee, items: items.map(i => ({ item_id: i.id, item_name: i.name, price: i.price, quantity: i.qty })) })
         };
 
+        // 🌟 2. 商品描述顯示最小訂購量為 5 件
         const products = [
             {
                 id: "prod_1",
                 name: "慢慢吃 五色野菜罐",
                 price: 60,
-                desc: "包含紅蘿蔔、南瓜、紫薯、黃薯與青江菜條，營養均衡的人氣首選。",
+                desc: "包含紅蘿蔔、南瓜、紫薯、黃薯與青江菜條，營養均衡的人氣首選。(最小訂購量為 5 件)",
                 img: "S__274382858.jpg",
                 tag: "人氣 Top 1"
             }
@@ -1199,6 +1254,43 @@
             } catch (e) {}
         }
 
+        // 🌟 3. 讀取 Google Sheet 剩餘數量 (C2) 並即時更換購物車內的顯示
+        async function fetchSystemStatus() {
+            const banner = document.getElementById('systemBanner');
+            const cartQuotaDisplay = document.getElementById('cartQuotaDisplay');
+
+            try {
+                const res = await fetch(CONTROL_SCRIPT_URL);
+                const data = await res.json();
+                
+                systemIsOpen = (data.isOpen === 'Y');
+                remainingQuota = parseInt(data.remainingQuota, 10) || 0;
+
+                // 更新購物車內的試算表剩餘配額顯示
+                cartQuotaDisplay.innerText = `💡 本月試算表剩餘可訂購量：${remainingQuota} 件`;
+
+                if (!systemIsOpen) {
+                    banner.className = "system-banner warning";
+                    banner.innerText = "📢 目前非開放訂購時間，暫停接單。";
+                    banner.style.display = "block";
+                } else if (remainingQuota < MIN_ORDER_QTY) {
+                    systemIsOpen = false;
+                    banner.className = "system-banner warning";
+                    banner.innerText = `📢 本月可訂購數量（剩餘 ${remainingQuota} 件）已低於最低下單量（${MIN_ORDER_QTY} 件），暫停接單。`;
+                    banner.style.display = "block";
+                } else {
+                    banner.className = "system-banner info";
+                    banner.innerText = `✨ 本月開放訂購中！剩餘可訂購配額：${remainingQuota} 件（單筆最低訂購 ${MIN_ORDER_QTY} 件）`;
+                    banner.style.display = "block";
+                }
+            } catch (err) {
+                console.error("無法取得系統狀態：", err);
+                cartQuotaDisplay.innerText = `💡 試算表剩餘量連線異常`;
+            }
+            renderProducts();
+            updateCartUI();
+        }
+
         function renderProducts() {
             const container = document.getElementById('productsContainer');
             container.innerHTML = products.map(product => `
@@ -1212,7 +1304,9 @@
                         <p class="product-desc">${product.desc}</p>
                         <div class="product-footer">
                             <span class="product-price">NT$ ${product.price}</span>
-                            <button class="add-cart-btn" onclick="addToCart('${product.id}')">＋ 加入購物車</button>
+                            <button class="add-cart-btn" ${!systemIsOpen ? 'disabled' : ''} onclick="addToCart('${product.id}')">
+                                ${systemIsOpen ? '＋ 加入購物車' : '暫停下單'}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1222,13 +1316,25 @@
         }
 
         function addToCart(productId) {
+            if (!systemIsOpen) {
+                showToast("目前系統未開放下單！");
+                return;
+            }
             const product = products.find(p => p.id === productId);
             const exist = cart.find(i => i.id === productId);
+            
             if (exist) {
+                if (exist.qty + 1 > remainingQuota) {
+                    showToast(`訂購總量不能超過試算表剩餘配額（${remainingQuota} 件）！`);
+                    return;
+                }
                 exist.qty++;
             } else {
-                cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
+                // 首次加入預設帶入 5 件（若剩餘配額低於5，則帶入剩餘配額）
+                const initialQty = Math.min(MIN_ORDER_QTY, remainingQuota);
+                cart.push({ id: product.id, name: product.name, price: product.price, qty: initialQty });
             }
+
             saveCartToStorage();
             updateCartUI();
             toggleCart(true);
@@ -1242,7 +1348,7 @@
             return {
                 store: selectedOption.getAttribute('data-store'),
                 type: selectedOption.getAttribute('data-type'),
-                fee: parseInt(selectedOption.getAttribute('data-fee') || '129', 10),
+                fee: parseInt(selectedOption.getAttribute('data-fee') || '134', 10),
                 fullText: selectedOption.text
             };
         }
@@ -1304,7 +1410,12 @@
         function changeQty(productId, delta) {
             const item = cart.find(i => i.id === productId);
             if (item) {
-                item.qty += delta;
+                const newQty = item.qty + delta;
+                if (delta > 0 && newQty > remainingQuota) {
+                    showToast(`數量超出試算表剩餘配額（${remainingQuota} 件）！`);
+                    return;
+                }
+                item.qty = newQty;
                 if (item.qty <= 0) {
                     cart = cart.filter(i => i.id !== productId);
                     GA4.removeFromCart(item);
@@ -1369,7 +1480,9 @@
             toggleErrorState('group-phone', !phoneValid && touched.phone);
             toggleErrorState('group-address', !addressValid && touched.address);
 
-            const isFormValid = nameValid && phoneValid && addressValid && cart.length > 0;
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+
+            const isFormValid = systemIsOpen && nameValid && phoneValid && addressValid && totalQty >= MIN_ORDER_QTY;
 
             if (isFormValid) {
                 anchor.classList.remove('disabled');
@@ -1394,21 +1507,13 @@
             }
         }
 
-        // 請將這裡換成你真正的 LINE 官方帳號 ID（例如 @123abcde），
-        // 這是給「不在 LINE App 內開啟」時的備援連結使用的
-        const LINE_OA_ID = "@your_line_id";
-        const BACKEND_URL = ""; 
+        const LINE_OA_ID = "@your_line_id"; // 請填寫您的 LINE OA ID
 
-        function buildOrderText(name, phone, address) {
+        function buildOrderText(name, phone, address, orderId) {
             let itemsText = cart.map(i => `• ${i.name} x ${i.qty} (NT$ ${i.price * i.qty})`).join('\n');
             let subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
             let shipping = getCurrentShippingInfo();
             let total = subtotal + shipping.fee;
-            let orderId = 'ES-' + Date.now();
-
-            let paymentText = shipping.type.includes('先匯款') 
-                ? '先匯款 (轉帳號碼由專人於 LINE 提供)' 
-                : '超商取貨付款 (取貨時支付現金)';
 
             return `【慢慢吃 寶寶手指食物 - 新訂單】\n` +
                    `訂單編號：${orderId}\n\n` +
@@ -1422,12 +1527,13 @@
                    `姓名：${name}\n` +
                    `電話：${phone}\n` +
                    `取件門市：${address}\n` +
-                   `付款方式：${paymentText}`;
+                   `付款方式：貨到付款`;
         }
 
         function updateCheckoutHref(name, phone, address) {
             const anchor = document.getElementById('checkoutAnchor');
-            const text = buildOrderText(name, phone, address);
+            const tempOrderId = 'ES-' + Date.now();
+            const text = buildOrderText(name, phone, address, tempOrderId);
             
             if (typeof liff !== 'undefined' && liff.isInClient && liff.isInClient()) {
                 anchor.setAttribute('href', '#');
@@ -1438,10 +1544,18 @@
             }
         }
 
-        function handleCheckoutClick(event) {
+        async function handleCheckoutClick(event) {
             touched.name = true;
             touched.phone = true;
             touched.address = true;
+
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+
+            if (totalQty < MIN_ORDER_QTY) {
+                event.preventDefault();
+                alert(`單筆最少訂購數量為 ${MIN_ORDER_QTY} 件！目前僅選擇 ${totalQty} 件。`);
+                return;
+            }
 
             if (!validateForm()) {
                 event.preventDefault();
@@ -1453,28 +1567,45 @@
             const phone = document.getElementById('input-phone').value.trim();
             const address = document.getElementById('input-address').value.trim();
             const shipping = getCurrentShippingInfo();
-            const text = buildOrderText(name, phone, address);
-            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0) + shipping.fee;
             const orderId = 'ES-' + Date.now();
+            const text = buildOrderText(name, phone, address, orderId);
+            const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            const total = subtotal + shipping.fee;
+
+            const anchor = document.getElementById('checkoutAnchor');
+            anchor.classList.add('disabled');
+            anchor.innerText = "⏳ 正在同步訂單至試算表...";
+
+            // 發送資料至整合後的 Apps Script (POST 請求)
+            try {
+                const payload = {
+                    orderId: orderId,
+                    time: new Date().toLocaleString(),
+                    name: name,
+                    phone: phone,
+                    address: address,
+                    shipping: {
+                        store: shipping.store,
+                        type: shipping.type,
+                        fee: shipping.fee
+                    },
+                    cart: cart,
+                    total: total
+                };
+
+                await fetch(DATA_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8' // 規避 CORS 預檢
+                    },
+                    body: JSON.stringify(payload)
+                });
+            } catch (e) {
+                console.error("試算表同步失敗，但仍將進行 LINE 跳轉", e);
+            }
 
             GA4.addShippingInfo(shipping.fee, `${shipping.store}_${shipping.type}`);
             GA4.purchase(orderId, total, cart, shipping.fee);
-
-            if (BACKEND_URL) {
-                try {
-                    const payload = JSON.stringify({
-                        orderId: orderId,
-                        name: name,
-                        phone: phone,
-                        address: address,
-                        shipping: shipping,
-                        cart: cart,
-                        total: total,
-                        time: new Date().toISOString()
-                    });
-                    navigator.sendBeacon(BACKEND_URL, new Blob([payload], { type: 'text/plain' }));
-                } catch (e) {}
-            }
 
             cart = [];
             saveCartToStorage();
@@ -1483,19 +1614,22 @@
             if (typeof liff !== 'undefined' && liff.isInClient && liff.isInClient()) {
                 event.preventDefault();
                 liff.sendMessages([{ type: 'text', text: text }])
-                    .then(() => { showToast("訂單已成功送出至聊天室！"); })
+                    .then(() => { 
+                        showToast("訂單已成功送出至聊天室！"); 
+                        setTimeout(() => location.reload(), 1500);
+                    })
                     .catch((err) => {
                         console.error("liff.sendMessages failed:", err);
                         showToast("請手動複製訂單至 LINE 聊天室。");
                     });
             } else {
-                showToast("正在前往 LINE 官方帳號送出訂單...");
+                showToast("訂單已記錄至試算表，正在前往 LINE 送出訂單...");
+                setTimeout(() => location.reload(), 2000);
             }
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            renderProducts();
-            updateCartUI(); // 依實際購物車內容（空的就是 0）重新計算畫面金額，避免顯示 HTML 裡寫死的預設值
+            fetchSystemStatus();
             if (typeof liff !== 'undefined') {
                 liff.init({ liffId: "2011554839-542CxEdf" }).catch((err) => {
                     console.error("LIFF init failed:", err);
