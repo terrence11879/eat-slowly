@@ -1125,11 +1125,11 @@
             </div>
             <div class="cart-summary-line">
                 <span>超商冷凍運費：</span>
-                <span id="cartShippingFee">NT$ 129</span>
+                <span id="cartShippingFee">NT$ 0</span>
             </div>
             <div class="cart-total">
                 <span>總計金額：</span>
-                <span id="cartTotal">NT$ 189</span>
+                <span id="cartTotal">NT$ 0</span>
             </div>
             <a id="checkoutAnchor" href="#" target="_blank" class="checkout-btn disabled" onclick="handleCheckoutClick(event)">前往 LINE 確認送出訂單</a>
         </div>
@@ -1138,8 +1138,8 @@
     <!-- 手機版固定結帳列 -->
     <div class="mobile-bar">
         <div>
-            <div style="font-size: 0.8rem; color: var(--text-sub);" id="mobileShippingLabel">含 7-11 冷凍純取運費 $129</div>
-            <div id="mobileBarTotal" style="font-size: 1.1rem; font-weight: 700; color: var(--primary-terracotta);">NT$ 189</div>
+            <div style="font-size: 0.8rem; color: var(--text-sub);" id="mobileShippingLabel">尚未加入商品</div>
+            <div id="mobileBarTotal" style="font-size: 1.1rem; font-weight: 700; color: var(--primary-terracotta);">NT$ 0</div>
         </div>
         <button class="btn-primary" style="padding: 0.6rem 1.5rem; font-size: 0.95rem;" onclick="toggleCart()">去結帳填單</button>
     </div>
@@ -1272,7 +1272,9 @@
             cartShippingFee.textContent = `NT$ ${shippingFee}`;
             cartTotal.textContent = `NT$ ${finalTotal}`;
             mobileBarTotal.textContent = `NT$ ${finalTotal}`;
-            mobileShippingLabel.textContent = `含 ${shipping.store} ${shipping.type} 運費 $${shippingFee}`;
+            mobileShippingLabel.textContent = cart.length > 0
+                ? `含 ${shipping.store} ${shipping.type} 運費 $${shippingFee}`
+                : `尚未加入商品`;
 
             if (cart.length === 0) {
                 cartItems.innerHTML = '<p style="text-align:center; color:var(--text-sub); margin-top:2rem;">購物車目前是空的喔 🥕</p>';
@@ -1392,7 +1394,9 @@
             }
         }
 
-        const LINE_OA_ID = "@your_line_id"; // 請填寫您的 LINE OA ID
+        // 請將這裡換成你真正的 LINE 官方帳號 ID（例如 @123abcde），
+        // 這是給「不在 LINE App 內開啟」時的備援連結使用的
+        const LINE_OA_ID = "@your_line_id";
         const BACKEND_URL = ""; 
 
         function buildOrderText(name, phone, address) {
@@ -1480,7 +1484,10 @@
                 event.preventDefault();
                 liff.sendMessages([{ type: 'text', text: text }])
                     .then(() => { showToast("訂單已成功送出至聊天室！"); })
-                    .catch(() => { showToast("請手動複製訂單至 LINE 聊天室。"); });
+                    .catch((err) => {
+                        console.error("liff.sendMessages failed:", err);
+                        showToast("請手動複製訂單至 LINE 聊天室。");
+                    });
             } else {
                 showToast("正在前往 LINE 官方帳號送出訂單...");
             }
@@ -1488,8 +1495,11 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             renderProducts();
+            updateCartUI(); // 依實際購物車內容（空的就是 0）重新計算畫面金額，避免顯示 HTML 裡寫死的預設值
             if (typeof liff !== 'undefined') {
-                liff.init({ liffId: "YOUR_LIFF_ID" }).catch(() => {});
+                liff.init({ liffId: "2011554839-542CxEdf" }).catch((err) => {
+                    console.error("LIFF init failed:", err);
+                });
             }
         });
     </script>
