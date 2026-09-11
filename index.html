@@ -19,7 +19,7 @@
     {
       "@context": "https://schema.org/",
       "@type": "Product",
-      "name": "慢慢吃 五色野菜罐（手指食物組）",
+      "name": "慢慢吃 野菜組合包（手指食物組）",
       "image": "https://terrence11879.github.io/eat-slowly/S__274382858.jpg",
       "description": "嚴選 100% 在地有機原型蔬菜，無鹽無添加。專為寶寶設計的黃金握持尺寸與蒸軟度。",
       "brand": {
@@ -1119,7 +1119,7 @@
         
         <!-- 💡 購物車內即時顯示 Google Sheet 剩餘可訂購量 -->
         <div class="cart-quota-banner" id="cartQuotaDisplay">
-            💡 本月試算表剩餘可訂購量：載入中...
+            💡 本月剩餘可訂購量：載入中...
         </div>
 
         <div class="cart-body" id="cartItems">
@@ -1216,8 +1216,8 @@
         }
 
         const GA4 = {
-            viewItemList: () => safeGtag('event', 'view_item_list', { items: [{ item_id: 'prod_1', item_name: '慢慢吃 五色野菜罐', price: 60 }] }),
-            viewItem: () => safeGtag('event', 'view_item', { items: [{ item_id: 'prod_1', item_name: '慢慢吃 五色野菜罐', price: 60 }] }),
+            viewItemList: () => safeGtag('event', 'view_item_list', { items: [{ item_id: 'prod_1', item_name: '慢慢吃 野菜組合包', price: 60 }] }),
+            viewItem: () => safeGtag('event', 'view_item', { items: [{ item_id: 'prod_1', item_name: '慢慢吃 野菜組合包', price: 60 }] }),
             addToCart: (item) => safeGtag('event', 'add_to_cart', { currency: 'TWD', value: item.price, items: [{ item_id: item.id, item_name: item.name, price: item.price, quantity: 1 }] }),
             removeFromCart: (item) => safeGtag('event', 'remove_from_cart', { currency: 'TWD', value: item.price, items: [{ item_id: item.id, item_name: item.name, price: item.price, quantity: 1 }] }),
             beginCheckout: (total, items) => safeGtag('event', 'begin_checkout', { currency: 'TWD', value: total, items: items.map(i => ({ item_id: i.id, item_name: i.name, price: i.price, quantity: i.qty })) }),
@@ -1229,11 +1229,11 @@
         const products = [
             {
                 id: "prod_1",
-                name: "慢慢吃 五色野菜罐",
+                name: "慢慢吃 野菜組合包",
                 price: 60,
-                desc: "包含紅蘿蔔、南瓜、紫薯、黃薯與青江菜條，營養均衡的人氣首選。(一次訂購單位為 5 件)",
+                desc: "包含5-7種當季蔬菜，營養均衡的人氣首選。(一次訂購單位為 5 件)",
                 img: "S__274382858.jpg",
-                tag: "人氣 Top 1"
+                tag: "推薦商品"
             }
         ];
 
@@ -1266,8 +1266,8 @@
                 systemIsOpen = (data.isOpen === 'Y');
                 remainingQuota = parseInt(data.remainingQuota, 10) || 0;
 
-                // 更新購物車內的試算表剩餘配額顯示
-                cartQuotaDisplay.innerText = `💡 本月試算表剩餘可訂購量：${remainingQuota} 件`;
+                // 更新購物車內的剩餘配額顯示
+                cartQuotaDisplay.innerText = `💡 本月剩餘可訂購量：${remainingQuota} 件`;
 
                 if (!systemIsOpen) {
                     banner.className = "system-banner warning";
@@ -1285,7 +1285,7 @@
                 }
             } catch (err) {
                 console.error("無法取得系統狀態：", err);
-                cartQuotaDisplay.innerText = `💡 試算表剩餘量連線異常`;
+                cartQuotaDisplay.innerText = `💡 剩餘量連線異常`;
             }
             renderProducts();
             updateCartUI();
@@ -1325,7 +1325,7 @@
             
             if (exist) {
                 if (exist.qty + 1 > remainingQuota) {
-                    showToast(`訂購總量不能超過試算表剩餘配額（${remainingQuota} 件）！`);
+                    showToast(`訂購總量不能超過剩餘配額（${remainingQuota} 件）！`);
                     return;
                 }
                 exist.qty++;
@@ -1412,7 +1412,7 @@
             if (item) {
                 const newQty = item.qty + delta;
                 if (delta > 0 && newQty > remainingQuota) {
-                    showToast(`數量超出試算表剩餘配額（${remainingQuota} 件）！`);
+                    showToast(`數量超出剩餘配額（${remainingQuota} 件）！`);
                     return;
                 }
                 item.qty = newQty;
@@ -1574,7 +1574,7 @@
 
             const anchor = document.getElementById('checkoutAnchor');
             anchor.classList.add('disabled');
-            anchor.innerText = "⏳ 正在同步訂單至試算表...";
+            anchor.innerText = "⏳ 正在同步訂單至...";
 
             // 發送資料至整合後的 Apps Script (POST 請求)
             try {
@@ -1601,7 +1601,7 @@
                     body: JSON.stringify(payload)
                 });
             } catch (e) {
-                console.error("試算表同步失敗，但仍將進行 LINE 跳轉", e);
+                console.error("同步失敗，但仍將進行 LINE 跳轉", e);
             }
 
             GA4.addShippingInfo(shipping.fee, `${shipping.store}_${shipping.type}`);
@@ -1623,7 +1623,7 @@
                         showToast("請手動複製訂單至 LINE 聊天室。");
                     });
             } else {
-                showToast("訂單已記錄至試算表，正在前往 LINE 送出訂單...");
+                showToast("訂單已記錄至，正在前往 LINE 送出訂單...");
                 setTimeout(() => location.reload(), 2000);
             }
         }
